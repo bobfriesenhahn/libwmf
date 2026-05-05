@@ -233,7 +233,10 @@ int wmf_stream_printf (wmfAPI* API,wmfStream* stream,char* format,...)
 	va_start (argp,format);
 
 	for (;;)
-	{	length = vsnprintf (API->string_buffer.buffer,API->string_buffer.length,format,argp);
+	{	va_list argp_copy;
+		va_copy (argp_copy,argp);
+		length = vsnprintf (API->string_buffer.buffer,API->string_buffer.length,format,argp_copy);
+		va_end (argp_copy);
 
 		if ((length >= 0) && ((unsigned int)length < (API->string_buffer.length - 1))) break; /* i.e., success */
 
