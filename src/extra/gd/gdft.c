@@ -421,6 +421,7 @@ fontFetch (char **error, void *key)
     {
       *error = "Could not find/open font";
       gdFree (fullname);
+      gdFree (a->fontlist);
       gdFree (a);
       return NULL;
     }
@@ -430,6 +431,7 @@ fontFetch (char **error, void *key)
   if (err)
     {
       *error = "Could not read font";
+      gdFree (a->fontlist);
       gdFree (a);
       return NULL;
     }
@@ -473,6 +475,8 @@ fontFetch (char **error, void *key)
   if (!found)
     {
       *error = "Unable to find a CharMap that I can handle";
+      FT_Done_Face (a->face);
+      gdFree (a->fontlist);
       gdFree (a);
       return NULL;
     }
