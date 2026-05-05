@@ -335,14 +335,24 @@ fontFetch (char **error, void *key)
   char *fontsearchpath, *fontlist;
   char *fullname = NULL;
   char *name, *path, *dir;
-  char dummy = 0;
-  char *strtok_ptr = &dummy;
+  char *strtok_ptr = NULL;
   FT_Error err;
   FT_CharMap found = 0;
   FT_CharMap charmap;
 
   a = (font_t *) gdMalloc (sizeof (font_t));
+  if (!a)
+    {
+      *error = "Could not allocate font";
+      return NULL;
+    }
   a->fontlist = strdup (b->fontlist);
+  if (!a->fontlist)
+    {
+      *error = "Could not allocate font list";
+      gdFree (a);
+      return NULL;
+    }
   a->library = b->library;
 
   /*
@@ -352,7 +362,22 @@ fontFetch (char **error, void *key)
   if (!fontsearchpath)
     fontsearchpath = DEFAULT_FONTPATH;
   path = strdup (fontsearchpath);
+  if (!path)
+    {
+      *error = "Could not allocate font path";
+      gdFree (a->fontlist);
+      gdFree (a);
+      return NULL;
+    }
   fontlist = strdup (a->fontlist);
+  if (!fontlist)
+    {
+      *error = "Could not allocate font list";
+      gdFree (path);
+      gdFree (a->fontlist);
+      gdFree (a);
+      return NULL;
+    }
 
   /*
    * Must use gd_strtok_r else pointer corrupted by strtok in nested loop.
