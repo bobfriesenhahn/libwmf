@@ -261,10 +261,10 @@ static void xml_end (void * user_data, const char * name)
 	while (remaining >= 72)
 	{	bufptr = buffer;
 		for (i = 0; i < 18; i++)
-		{	b32 = (unsigned long) (             s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
+		{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 
 			*bufptr++ = (unsigned char) ((b32 >> 16)       );
 			*bufptr++ = (unsigned char) ((b32 >>  8) & 0xff);
@@ -278,10 +278,10 @@ static void xml_end (void * user_data, const char * name)
 	bufptr = buffer;
 	length = 0;
 	while (remaining >= 4)
-	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
 		*bufptr++ = (unsigned char) ((b32 >>  8) & 0xff);
@@ -291,9 +291,9 @@ static void xml_end (void * user_data, const char * name)
 		length += 3;
 	}
 	if (remaining == 3)
-	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 		b32 = (b32 << 6);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
@@ -303,8 +303,8 @@ static void xml_end (void * user_data, const char * name)
 		length += 2;
 	}
 	if (remaining == 2)
-	{	b32 =               (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 <<  6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =               (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 <<  6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 		b32 = (b32 << 12);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
