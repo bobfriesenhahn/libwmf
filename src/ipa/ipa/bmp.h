@@ -1115,7 +1115,7 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	{	unsigned int max_colors = 0;
 
 		if (bmp_info.bits_per_pixel <= 8)
-			max_colors = 1u << bmp_info.bits_per_pixel;
+			max_colors = 1u << (bmp_info.bits_per_pixel & 0x1F);
 
 		data->NColors = (unsigned int) bmp_info.number_colors;
 
@@ -1158,7 +1158,14 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	}
 
 	/* Read image data. */
-	if (bmp_info.compression == 2) bmp_info.bits_per_pixel <<= 1;
+	if (bmp_info.bits_per_pixel > 32)
+	{	WMF_ERROR (API,"BMP image has invalid bits_per_pixel");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
+	if (bmp_info.compression == 2)
+		bmp_info.bits_per_pixel = (unsigned short) ((bmp_info.bits_per_pixel & 0x3F) << 1);
 
 	bytes_per_line = 4 * ((bmp->width * bmp_info.bits_per_pixel + 31) / 32);
 
