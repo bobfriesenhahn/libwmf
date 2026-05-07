@@ -133,10 +133,16 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 	resolution_x = resolution_y = 72.0;
 	width = height = -1;
 
+	/* wmf_api_create only reads argv when WMF_OPT_ARGS is set, which we
+	 * don't request - but Coverity's auto-derived model can't see that
+	 * gate, so give argv a non-null sentinel to silence FORWARD_NULL.
+	 */
+	static char * empty_argv[] = { NULL };
+
 	flags = WMF_OPT_IGNORE_NONFATAL | WMF_OPT_FUNCTION;
 	api_options.function = wmf_gd_function;
 	api_options.argc = 0;
-	api_options.argv = NULL;
+	api_options.argv = empty_argv;
 
 	err = wmf_api_create (&API, flags, &api_options);
 	if (err != wmf_E_None) {
