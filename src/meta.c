@@ -209,10 +209,9 @@ static void write_header (wmfAPI* API, long header_start, long header_end)
 		return;
 	}
 
-	WMF_SEEK (API,header_start);
-
-	if (ERR (API))
-	{	WMF_DEBUG (API,"bailing...");
+	if (WMF_SEEK (API,header_start) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
 		return;
 	}
 

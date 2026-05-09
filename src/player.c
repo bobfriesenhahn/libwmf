@@ -161,7 +161,11 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 		       	API->err = wmf_E_EOF;
 		       	return (API->err);
 		}
-		WMF_SEEK (API, nPos);
+		if (WMF_SEEK (API, nPos) == (-1))
+		{	WMF_ERROR (API,"API's seek() failed on input stream!");
+			API->err = wmf_E_BadFile;
+			return (API->err);
+		}
 	}
 
  	P->Parameters = (unsigned char*) wmf_malloc (API, nMaxRecordSize);
@@ -457,10 +461,9 @@ static wmf_error_t WmfPlayMetaFile (wmfAPI* API)
 
 	for (i = 0; i < NUM_OBJECTS (API); i++) objects[i].type = 0;
 
-	WMF_SEEK (API,API->File->pos);
-
-	if (ERR (API))
-	{	WMF_DEBUG (API,"bailing...");
+	if (WMF_SEEK (API,API->File->pos) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
 		return (API->err);
 	}
 
