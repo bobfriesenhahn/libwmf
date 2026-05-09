@@ -42,7 +42,7 @@
 #define API_FILE_OPEN          (1<<22)
 
 #define API_ENABLE_EDITING     (1<<30)
-#define API_STANDARD_INTERFACE (1<<31)
+#define API_STANDARD_INTERFACE (1U<<31)
 
 /* API-independent defs & macros *only*
  */
