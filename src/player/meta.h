@@ -970,6 +970,11 @@ static int meta_polygons (wmfAPI* API,wmfRecord* Record)
 			polypoly.dc->pen->lopnStyle = PS_NULL;
 
 			polyline.dc = polypoly.dc;
+			if (count > SIZE_MAX / sizeof (wmfD_Coord))
+			{	WMF_ERROR (API,"polypolygon point count too large!");
+				API->err = wmf_E_InsMem;
+				return (changed);
+			}
 			polyline.pt = (wmfD_Coord*) wmf_malloc (API, count * sizeof (wmfD_Coord));
 			polyline.count = 0;
 
