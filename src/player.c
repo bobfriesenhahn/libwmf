@@ -150,9 +150,9 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 		//to SEEK_END. So use what we have to skip to the last byte and
 		//try and read it.
 		const long nPos = WMF_TELL (API);
-		WMF_SEEK (API, nPos + nMaxRecordSize - 1);
-		if (ERR (API))
-		{	WMF_DEBUG (API,"bailing...");
+		if (WMF_SEEK (API, nPos + nMaxRecordSize - 1) == (-1))
+		{	WMF_ERROR (API,"API's seek() failed on input stream!");
+			API->err = wmf_E_BadFile;
 			return (API->err);
 		}
 		int byte = WMF_READ (API);
