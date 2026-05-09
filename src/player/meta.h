@@ -903,8 +903,9 @@ static int meta_polygons (wmfAPI* API,wmfRecord* Record)
 			if (ERR (API)) break;
 		}
 	}
-	if (skip_record || (Record->size < 1 + polypoly.npoly + 2 * num_pars))
-	{	if (!skip_record)
+	int too_short = Record->size < 1 + polypoly.npoly + 2 * num_pars;
+	if (skip_record || too_short)
+	{	if (too_short)
 		{	WMF_ERROR (API,"Bad record - too few parameters for polypolygon!");
 			API->err = wmf_E_BadFormat;
 		}
