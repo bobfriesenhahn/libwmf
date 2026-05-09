@@ -507,7 +507,17 @@ void* wmf_malloc (wmfAPI* API,size_t size)
  *         Sets error state \b wmf_E_InsMem on failure.
  */
 void* wmf_calloc (wmfAPI* API,size_t number,size_t size)
-{	return (wmf_malloc (API,number * size));
+{	void* mem;
+
+	if (size != 0 && number > SIZE_MAX / size)
+	{	WMF_ERROR (API,"wmf_calloc: number * size overflows!");
+		API->err = wmf_E_InsMem;
+		return (0);
+	}
+
+	mem = wmf_malloc (API, number * size);
+	if (mem) memset (mem, 0, number * size);
+	return (mem);
 }
 
 /**
