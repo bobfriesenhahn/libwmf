@@ -91,4 +91,8 @@
 #define ERR(API)  ((API)->err != wmf_E_None)
 #define DIAG(API) ((API)->flags & WMF_OPT_DIAGNOSTICS)
 
+/* Returns 0 if 'requested' more bytes can be read from the current input
+ * position, otherwise -1 with API->err set. Position is preserved. */
+extern int wmf_can_supply (wmfAPI* API, long requested);
+
 #endif /* ! WMFDEFS_H */

@@ -284,3 +284,50 @@ long wmf_mem_tell (void* user_data)
 
 	return (mem_info->pos);
 }
+
+/**
+ * @internal
+ *
+ * Before allocating memory do a sanity check on size by seeking to
+ * claimed end to see if its possible. We're constrained here by the
+ * api and existing implementations to not simply seeking to SEEK_END.
+ * So use what we have to skip to the last byte and try and read it.
+ */
+int wmf_can_supply (wmfAPI* API, long requested)
+{	long pos;
+
+	if (requested < 0)
+	{	WMF_ERROR (API,"wmf_can_supply: negative request!");
+		API->err = wmf_E_BadFile;
+		return (-1);
+	}
+
+	if (requested == 0) return (0);
+
+	pos = WMF_TELL (API);
+	if (pos < 0)
+	{	WMF_ERROR (API,"API's tell() failed on input stream!");
+		API->err = wmf_E_BadFile;
+		return (-1);
+	}
+
+	if (WMF_SEEK (API, pos + requested - 1) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
+		return (-1);
+	}
+
+	if (WMF_READ (API) == (-1))
+	{	WMF_ERROR (API,"Unexpected EOF!");
+		API->err = wmf_E_EOF;
+		return (-1);
+	}
+
+	if (WMF_SEEK (API, pos) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
+		return (-1);
+	}
+
+	return (0);
+}

@@ -126,7 +126,13 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 	}
 
 	if (API->File->wmfheader->NumOfObjects > 0)
-	{	P->objects = (wmfObject*) wmf_malloc (API,NUM_OBJECTS (API) * sizeof (wmfObject));
+	{	//each object needs a CREATE* record of at least 6 bytes
+		if (wmf_can_supply (API, (long) NUM_OBJECTS (API) * 6) == (-1))
+		{	WMF_DEBUG (API,"bailing...");
+			return (API->err);
+		}
+
+		P->objects = (wmfObject*) wmf_malloc (API,NUM_OBJECTS (API) * sizeof (wmfObject));
 
 		if (ERR (API))
 		{	WMF_DEBUG (API,"bailing...");
@@ -143,27 +149,8 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 
 	U32 nMaxRecordSize = (MAX_REC_SIZE(API)  ) * 2 * sizeof (unsigned char);
 	if (nMaxRecordSize)
-	{
-		//before allocating memory do a sanity check on size by seeking
-		//to claimed end to see if its possible. We're constrained here
-		//by the api and existing implementations to not simply seeking
-		//to SEEK_END. So use what we have to skip to the last byte and
-		//try and read it.
-		const long nPos = WMF_TELL (API);
-		if (WMF_SEEK (API, nPos + nMaxRecordSize - 1) == (-1))
-		{	WMF_ERROR (API,"API's seek() failed on input stream!");
-			API->err = wmf_E_BadFile;
-			return (API->err);
-		}
-		int byte = WMF_READ (API);
-		if (byte == (-1))
-		{	WMF_ERROR (API,"Unexpected EOF!");
-		       	API->err = wmf_E_EOF;
-		       	return (API->err);
-		}
-		if (WMF_SEEK (API, nPos) == (-1))
-		{	WMF_ERROR (API,"API's seek() failed on input stream!");
-			API->err = wmf_E_BadFile;
+	{	if (wmf_can_supply (API, (long) nMaxRecordSize) == (-1))
+		{	WMF_DEBUG (API,"bailing...");
 			return (API->err);
 		}
 	}
