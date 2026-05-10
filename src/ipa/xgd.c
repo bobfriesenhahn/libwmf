@@ -22,6 +22,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "wmfdefs.h"
@@ -545,11 +546,22 @@ int * wmf_gd_image_pixels (void * gd_image)
 		static int* export_pixels = 0;
 		static size_t export_count = 0;
 
-		size_t width = gdImageSX (img);
-		size_t height = gdImageSY (img);
-		size_t count = width * height;
+		int img_w = gdImageSX (img);
+		int img_h = gdImageSY (img);
+		size_t width;
+		size_t height;
+		size_t count;
 		size_t row;
 		size_t col;
+
+		if (img_w <= 0 || img_h <= 0) return (0);
+
+		width = (size_t) img_w;
+		height = (size_t) img_h;
+
+		if (width > SIZE_MAX / height) return (0);
+		count = width * height;
+		if (count > SIZE_MAX / sizeof (int)) return (0);
 
 		if (count > export_count)
 		{	int* more = (int*) realloc (export_pixels,count * sizeof (int));
