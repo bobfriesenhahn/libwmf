@@ -138,6 +138,7 @@ void wmf_gd_function (wmfAPI* API)
 	gd = (gd_t*) ddata->gd_data;
 
 	gd->image = 0;
+	gd->flat_pixels = 0;
 
 	ddata->file   = 0;
 	ddata->memory = 0;
@@ -535,16 +536,16 @@ static int setlinestyle (wmfAPI* API,wmfDC* dc)
 }
 #endif /* HAVE_GD */
 
-int * wmf_gd_image_pixels (void * gd_image)
+int * wmf_gd_get_image_pixels (wmfAPI* API)
 {
 	int * pixels = 0;
 #ifdef HAVE_GD
-	gdImagePtr img = (gdImagePtr) gd_image;
+	wmf_gd_t* ddata = WMF_GD_GetData (API);
+	gdImagePtr img = (gdImagePtr) ddata->gd_image;
 	if (img)
 	{
 #ifdef HAVE_SYS_GD
-		static int* export_pixels = 0;
-		static size_t export_count = 0;
+		gd_t* gd = (gd_t*) ddata->gd_data;
 
 		int img_w = gdImageSX (img);
 		int img_h = gdImageSY (img);
@@ -563,20 +564,41 @@ int * wmf_gd_image_pixels (void * gd_image)
 		count = width * height;
 		if (count > SIZE_MAX / sizeof (int)) return (0);
 
-		if (count > export_count)
-		{	int* more = (int*) realloc (export_pixels,count * sizeof (int));
-			if (more == 0) return (0);
-			export_pixels = more;
-			export_count = count;
+		if (gd->flat_pixels)
+		{	wmf_free (API,gd->flat_pixels);
+			gd->flat_pixels = 0;
 		}
+
+		gd->flat_pixels = (int*) wmf_malloc (API,count * sizeof (int));
+		if (gd->flat_pixels == 0) return (0);
 
 		for (row = 0; row < height; row++)
 		{	for (col = 0; col < width; col++)
-			{	export_pixels[(row * width) + col] = gdImageTrueColorPixel (img,col,row);
+			{	gd->flat_pixels[(row * width) + col] = gdImageTrueColorPixel (img,col,row);
 			}
 		}
 
-		pixels = export_pixels;
+		pixels = gd->flat_pixels;
+#else
+		pixels = img->_tpixels;
+#endif
+	}
+#endif /* HAVE_GD */
+	return (pixels);
+}
+
+int * wmf_gd_image_pixels (void * gd_image)
+{
+	int * pixels = 0;
+#ifdef HAVE_GD
+	gdImagePtr img = (gdImagePtr) gd_image;
+	if (img)
+	{
+#ifdef HAVE_SYS_GD
+		/* Deprecated. The public libgd API exposes no contiguous backing
+		 * store to borrow, so this returns NULL when libwmf is built
+		 * against system libgd. Use wmf_gd_get_image_pixels() instead.
+		 */
 #else
 		pixels = img->_tpixels;
 #endif

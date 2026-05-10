@@ -56,6 +56,7 @@ static void wmf_gd_device_close (wmfAPI* API)
 	if (gd->brush.image) gdImageDestroy (gd->brush.image);
 	if (gd->pen.image) gdImageDestroy (gd->pen.image);
 	if (gd->image) gdImageDestroy (gd->image);
+	if (gd->flat_pixels) wmf_free (API,gd->flat_pixels);
 }
 
 /* This is called from the beginning of each play for initial page setup

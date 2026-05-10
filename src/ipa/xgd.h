@@ -64,6 +64,8 @@ static int setlinestyle (wmfAPI*,wmfDC*);
 struct _gd_t
 {	gdImagePtr image;
 
+	int* flat_pixels; /* sys-gd flatten cache for wmf_gd_get_image_pixels */
+
 	int white;
 
 	/* Pen data */

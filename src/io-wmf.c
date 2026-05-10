@@ -204,7 +204,7 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 
 	wmf_mem_close (API);
 
-	if (ddata->gd_image != NULL) gd_pixels = wmf_gd_image_pixels (ddata->gd_image);
+	if (ddata->gd_image != NULL) gd_pixels = wmf_gd_get_image_pixels (API);
 	if (gd_pixels == NULL) {
 		g_set_error (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
 			     "Couldn't decode WMF file - no output (huh?)");
